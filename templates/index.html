@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محامي تونس - خبير القانون التونسي</title>
+    <title id="page-title">محامي تونس - خبير القانون التونسي</title>
     <style>
         * {
             margin: 0;
@@ -21,27 +21,150 @@
             padding: 20px;
         }
 
-        .header {
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
+
+        .home-container {
+            max-width: 1200px;
+            width: 100%;
             text-align: center;
-            margin-bottom: 30px;
+        }
+
+        .header {
+            margin-bottom: 50px;
             color: white;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
+            font-size: 3rem;
+            margin-bottom: 10px;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             opacity: 0.9;
             color: #a0a0c0;
         }
 
-        .chat-container {
+        .branches-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .branch-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .branch-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .branch-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .branch-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .branch-card p {
+            font-size: 1rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .branch-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .branch-card.locked:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .lock-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .chat-page, .about-page {
+            display: none;
             width: 100%;
             max-width: 700px;
+        }
+
+        .chat-page.active, .about-page.active {
+            display: block;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .chat-container {
             background: white;
             border-radius: 16px;
             overflow: hidden;
@@ -146,23 +269,6 @@
             display: block;
         }
 
-        .chat-box::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-box::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
-
         .welcome-message {
             text-align: center;
             color: #666;
@@ -171,33 +277,233 @@
             border-radius: 12px;
             margin-bottom: 10px;
         }
+
+        .about-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            text-align: right;
+        }
+
+        .about-content h2 {
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .about-content p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .about-content.ltr {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>محامي تونس</h1>
-        <p>خبير القانون التونسي - اسأل عن أي قانون أو مادة قانونية</p>
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="ar">العربية</button>
+        <button class="lang-btn" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="fr">Français</button>
     </div>
 
-    <div class="chat-container">
-        <div class="chat-box" id="chatBox">
-            <div class="welcome-message">
-                مرحباً! أنا خبير القانون التونسي.<br>
-                اسألني أي سؤال حول القوانين التونسية.
+    <div class="home-container" id="homePage">
+        <div class="header">
+            <h1 id="main-title">محامي تونس</h1>
+            <p id="main-subtitle">خبير القانون التونسي - اسأل عن أي قانون أو مادة قانونية</p>
+        </div>
+
+        <div class="branches-container">
+            <div class="branch-card" onclick="showPage('about')">
+                <div class="branch-icon">📚</div>
+                <h2 id="about-title">عن الموقع</h2>
+                <p id="about-desc">تعرف على هدف الموقع ومهمتنا في توفير المعلومات القانونية</p>
+            </div>
+
+            <div class="branch-card" onclick="showPage('chat')">
+                <div class="branch-icon">🤖</div>
+                <h2 id="chat-title">المحامي الآلي</h2>
+                <p id="chat-desc">تحدث مع خبير القانون التونسي واحصل على إجابات فورية</p>
+            </div>
+
+            <div class="branch-card locked">
+                <div class="lock-badge" id="locked-badge">قريباً</div>
+                <div class="branch-icon">🎓</div>
+                <h2 id="student-title">منصة الطلاب</h2>
+                <p id="student-desc">مساحة مخصصة للطلاب للدراسة والتدريب على القضايا القانونية</p>
             </div>
         </div>
+    </div>
 
-        <div class="loading" id="loading">
-            جاري كتابة الإجابة...
+    <div class="chat-page" id="chatPage">
+        <button class="back-btn" onclick="showPage('home')">← <span id="back-home">الرئيسية</span></button>
+
+        <div class="chat-container">
+            <div class="chat-box" id="chatBox">
+                <div class="welcome-message" id="welcome-msg">
+                    مرحباً! أنا خبير القانون التونسي.<br>
+                    اسألني أي سؤال حول القوانين التونسية.
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <span id="loading-text">جاري كتابة الإجابة...</span>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="اكتب سؤالك القانوني هنا..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" id="sendBtn" data-send="إرسال">إرسال</button>
+            </div>
         </div>
+    </div>
 
-        <div class="input-area">
-            <input type="text" id="userInput" placeholder="اكتب سؤالك القانوني هنا..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()" id="sendBtn">إرسال</button>
+    <div class="about-page" id="aboutPage">
+        <button class="back-btn" onclick="showPage('home')">← <span id="back-home-about">الرئيسية</span></button>
+
+        <div class="about-content" id="about-content">
+            <h2 id="about-page-title">عن محامي تونس</h2>
+            <p id="about-p1">
+                موقع محامي تونس هو منصة قانونية إلكترونية تهدف إلى توفير المعلومات القانونية
+                للمواطنين التونسيين بطريقة سهلة ومبسطة.
+            </p>
+            <p id="about-p2">
+                نحن نستخدم تقنيات الذكاء الاصطناعي المتقدمة لتقديم إجابات دقيقة على استفساراتكم
+                القانونية بناءً على القوانين التونسية الرسمية.
+            </p>
+            <p id="about-p3">
+                <strong>هدفنا:</strong> جعل القانون التونسي في متناول الجميع، وتعزيز الوعي القانوني
+                في المجتمع التونسي.
+            </p>
+            <p id="about-p4" style="color: #667eea; margin-top: 20px;">
+                ⚠️ تنبيه: المعلومات المقدمة هي لأغراض تعليمية فقط ولا تغني عن استشارة محامٍ متخصص.
+            </p>
         </div>
     </div>
 
     <script>
+        const translations = {
+            ar: {
+                title: "محامي تونس",
+                subtitle: "خبير القانون التونسي - اسأل عن أي قانون أو مادة قانونية",
+                aboutTitle: "عن الموقع",
+                aboutDesc: "تعرف على هدف الموقع ومهمتنا في توفير المعلومات القانونية",
+                chatTitle: "المحامي الآلي",
+                chatDesc: "تحدث مع خبير القانون التونسي واحصل على إجابات فورية",
+                studentTitle: "منصة الطلاب",
+                studentDesc: "مساحة مخصصة للطلاب للدراسة والتدريب على القضايا القانونية",
+                lockedBadge: "قريباً",
+                backHome: "الرئيسية",
+                welcome: "مرحباً! أنا خبير القانون التونسي.<br>اسألني أي سؤال حول القوانين التونسية.",
+                loading: "جاري كتابة الإجابة...",
+                send: "إرسال",
+                placeholder: "اكتب سؤالك القانوني هنا...",
+                aboutPageTitle: "عن محامي تونس",
+                aboutP1: "موقع محامي تونس هو منصة قانونية إلكترونية تهدف إلى توفير المعلومات القانونية للمواطنين التونسيين بطريقة سهلة ومبسطة.",
+                aboutP2: "نحن نستخدم تقنيات الذكاء الاصطناعي المتقدمة لتقديم إجابات دقيقة على استفساراتكم القانونية بناءً على القوانين التونسية الرسمية.",
+                aboutP3: "<strong>هدفنا:</strong> جعل القانون التونسي في متناول الجميع، وتعزيز الوعي القانوني في المجتمع التونسي.",
+                aboutP4: "⚠️ تنبيه: المعلومات المقدمة هي لأغراض تعليمية فقط ولا تغني عن استشارة محامٍ متخصص."
+            },
+            en: {
+                title: "Tunisia Lawyer",
+                subtitle: "Tunisian Law Expert - Ask about any law or legal article",
+                aboutTitle: "About",
+                aboutDesc: "Learn about the website's goal and our mission to provide legal information",
+                chatTitle: "AI Lawyer",
+                chatDesc: "Chat with the Tunisian law expert and get instant answers",
+                studentTitle: "Student Platform",
+                studentDesc: "Dedicated space for students to study and practice legal cases",
+                lockedBadge: "Coming Soon",
+                backHome: "Home",
+                welcome: "Hello! I'm the Tunisian law expert.<br>Ask me any question about Tunisian laws.",
+                loading: "Writing answer...",
+                send: "Send",
+                placeholder: "Type your legal question here...",
+                aboutPageTitle: "About Tunisia Lawyer",
+                aboutP1: "Tunisia Lawyer is an electronic legal platform aimed at providing legal information to Tunisian citizens in an easy and simplified manner.",
+                aboutP2: "We use advanced AI technologies to provide accurate answers to your legal inquiries based on official Tunisian laws.",
+                aboutP3: "<strong>Our Mission:</strong> Make Tunisian law accessible to everyone and promote legal awareness in Tunisian society.",
+                aboutP4: "⚠️ Notice: The information provided is for educational purposes only and does not replace consulting a specialized lawyer."
+            },
+            fr: {
+                title: "Avocat Tunisie",
+                subtitle: "Expert en droit tunisien - Posez vos questions sur les lois",
+                aboutTitle: "À propos",
+                aboutDesc: "Découvrez l'objectif du site et notre mission d'information juridique",
+                chatTitle: "Avocat IA",
+                chatDesc: "Discutez avec l'expert en droit tunisien et obtenez des réponses",
+                studentTitle: "Plateforme Étudiants",
+                studentDesc: "Espace dédié aux étudiants pour étudier les cas juridiques",
+                lockedBadge: "Bientôt",
+                backHome: "Accueil",
+                welcome: "Bonjour! Je suis l'expert en droit tunisien.<br>Posez-moi toute question sur les lois tunisiennes.",
+                loading: "Rédaction de la réponse...",
+                send: "Envoyer",
+                placeholder: "Posez votre question juridique ici...",
+                aboutPageTitle: "À propos d'Avocat Tunisie",
+                aboutP1: "Avocat Tunisie est une plateforme juridique électronique visant à fournir des informations juridiques aux citoyens tunisiens de manière simple.",
+                aboutP2: "Nous utilisons des technologies d'IA avancées pour fournir des réponses précises à vos questions juridiques basées sur les lois tunisiennes officielles.",
+                aboutP3: "<strong>Notre Mission:</strong> Rendre le droit tunisien accessible à tous et promouvoir la conscience juridique dans la société tunisienne.",
+                aboutP4: "⚠️ Avis: Les informations fournies sont à des fins éducatives uniquement et ne remplacent pas la consultation d'un avocat spécialisé."
+            }
+        };
+
+        let currentLang = 'ar';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            document.getElementById('page-title').textContent = t.title;
+            document.getElementById('main-title').textContent = t.title;
+            document.getElementById('main-subtitle').textContent = t.subtitle;
+            document.getElementById('about-title').textContent = t.aboutTitle;
+            document.getElementById('about-desc').textContent = t.aboutDesc;
+            document.getElementById('chat-title').textContent = t.chatTitle;
+            document.getElementById('chat-desc').textContent = t.chatDesc;
+            document.getElementById('student-title').textContent = t.studentTitle;
+            document.getElementById('student-desc').textContent = t.studentDesc;
+            document.getElementById('locked-badge').textContent = t.lockedBadge;
+            document.getElementById('back-home').textContent = t.backHome;
+            document.getElementById('back-home-about').textContent = t.backHome;
+            document.getElementById('welcome-msg').innerHTML = t.welcome;
+            document.getElementById('loading-text').textContent = t.loading;
+            document.getElementById('sendBtn').textContent = t.send;
+            document.getElementById('userInput').placeholder = t.placeholder;
+            document.getElementById('about-page-title').textContent = t.aboutPageTitle;
+            document.getElementById('about-p1').textContent = t.aboutP1;
+            document.getElementById('about-p2').textContent = t.aboutP2;
+            document.getElementById('about-p3').innerHTML = t.aboutP3;
+            document.getElementById('about-p4').textContent = t.aboutP4;
+
+            const aboutContent = document.getElementById('about-content');
+            if (lang === 'ar') {
+                aboutContent.classList.remove('ltr');
+            } else {
+                aboutContent.classList.add('ltr');
+            }
+        }
+
+        function showPage(page) {
+            document.getElementById('homePage').style.display = page === 'home' ? 'block' : 'none';
+            document.getElementById('chatPage').classList.toggle('active', page === 'chat');
+            document.getElementById('aboutPage').classList.toggle('active', page === 'about');
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+        });
+
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 sendMessage();
@@ -214,7 +520,6 @@
             const loading = document.getElementById('loading');
             const sendBtn = document.getElementById('sendBtn');
 
-            // Remove welcome message on first send
             const welcome = chatBox.querySelector('.welcome-message');
             if (welcome) {
                 welcome.remove();
@@ -242,11 +547,13 @@
                 if (data.response) {
                     chatBox.innerHTML += `<div class="message bot-message">${escapeHtml(data.response)}</div>`;
                 } else {
-                    chatBox.innerHTML += `<div class="message bot-message">عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.</div>`;
+                    const t = translations[currentLang];
+                    chatBox.innerHTML += `<div class="message bot-message">${currentLang === 'ar' ? 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.' : currentLang === 'en' ? 'Sorry, an error occurred. Please try again.' : 'Désolé, une erreur est survenue. Veuillez réessayer.'}</div>`;
                 }
             } catch (error) {
                 loading.classList.remove('active');
-                chatBox.innerHTML += `<div class="message bot-message">عذراً، حدث خطأ في الاتصال.</div>`;
+                const t = translations[currentLang];
+                chatBox.innerHTML += `<div class="message bot-message">${currentLang === 'ar' ? 'عذراً، حدث خطأ في الاتصال.' : currentLang === 'en' ? 'Sorry, connection error.' : 'Désolé, erreur de connexion.'}</div>`;
             }
 
             sendBtn.disabled = false;
