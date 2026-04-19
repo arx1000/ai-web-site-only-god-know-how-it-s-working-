@@ -53,6 +53,8 @@ print("Loading law data...")
 law_data = []
 
 for f in sorted(glob.glob("training/split/*.json")) + sorted(glob.glob("training/*.json")):
+    if "law_knowledge.json" in f and "split" not in f:
+        continue  # Skip corrupted file
     print(f"  Loading {f}...")
     with open(f, encoding="utf-8") as fp:
         data = json.load(fp)
