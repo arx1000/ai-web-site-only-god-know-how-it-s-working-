@@ -52,7 +52,7 @@ def normalize_arabic(text):
 print("Loading law data...")
 law_data = []
 
-for f in sorted(glob.glob("training/split/*.json")):
+for f in sorted(glob.glob("training/split/*.json")) + sorted(glob.glob("training/*.json")):
     print(f"  Loading {f}...")
     with open(f, encoding="utf-8") as fp:
         data = json.load(fp)
