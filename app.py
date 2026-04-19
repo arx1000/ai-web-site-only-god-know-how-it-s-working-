@@ -55,26 +55,31 @@ def normalize_arabic(text):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
+def load_split_files(pattern, base_name):
+    """Load all split files matching pattern"""
+    import glob
+    files = sorted(glob.glob(pattern))
+    data = []
+    for filepath in files:
+        print(f"  Loading {filepath}...")
+        with open(filepath, "r", encoding="utf-8") as f:
+            chunk = json.load(f)
+            for item in chunk:
+                item["content"] = normalize_arabic(item.get("content") or item.get("text", ""))
+            data.extend(chunk)
+    return data
+
 print("Loading law data...")
 law_data = []
 
-with open("training/law_knowledge.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-    for item in data:
-        item["content"] = normalize_arabic(item.get("content") or item.get("text", ""))
-    law_data.extend(data)
+print("Loading law_knowledge split files...")
+law_data.extend(load_split_files("training/split/law_knowledge_*.json", "law_knowledge"))
 
-with open("training/law_data.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-    for item in data:
-        item["content"] = normalize_arabic(item.get("content") or item.get("text", ""))
-    law_data.extend(data)
+print("Loading law_data split files...")
+law_data.extend(load_split_files("training/split/law_data_*.json", "law_data"))
 
-with open("training/magazine_training.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-    for item in data:
-        item["content"] = normalize_arabic(item.get("content") or item.get("text", ""))
-    law_data.extend(data)
+print("Loading magazine_training split files...")
+law_data.extend(load_split_files("training/split/magazine_training_*.json", "magazine_training"))
 
 print(f"Loaded {len(law_data)} law documents")
 
