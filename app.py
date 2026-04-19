@@ -52,15 +52,17 @@ def normalize_arabic(text):
 print("Loading law data...")
 law_data = []
 
-for f in sorted(glob.glob("training/split/*.json")) + sorted(glob.glob("training/*.json")):
-    if "law_knowledge.json" in f and "split" not in f:
-        continue  # Skip corrupted file
-    print(f"  Loading {f}...")
-    with open(f, encoding="utf-8") as fp:
-        data = json.load(fp)
-        for item in data:
-            item["content"] = normalize_arabic(item.get("content", ""))
-        law_data.extend(data)
+for f in sorted(glob.glob("training/split/*.json")):
+    try:
+        print(f"  Loading {f}...")
+        with open(f, encoding="utf-8") as fp:
+            data = json.load(fp)
+            for item in data:
+                item["content"] = normalize_arabic(item.get("content", ""))
+            law_data.extend(data)
+        print(f"  Loaded {f}: {len(data)} items")
+    except Exception as e:
+        print(f"  Error loading {f}: {e}")
 
 print(f"Loaded {len(law_data)} documents")
 
